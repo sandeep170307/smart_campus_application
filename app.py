@@ -219,32 +219,80 @@ def scan_directory():
 
 def performance_analysis():
 
-    if len(students) == 0:
-        print("No student data available.")
-        return
+    try:
 
-    data = {
-        "Name": [s["name"] for s in students],
-        "Score": [s["score"] for s in students]
-    }
+        df = pd.read_csv("student_performance.csv")
 
-    df = pd.DataFrame(data)
+        print("\n--- Raw Data ---")
+        
+        print(df.head())
 
-    print("\n--- Student Data ---")
-    print(df)
+        print("\n--- Statistical Summary ---")
 
-    scores = np.array(df["Score"])
+        print(df.describe())
 
-    print("\nMean Score:", np.mean(scores))
-    print("Median Score:", np.median(scores))
-    print("Standard Deviation:", np.std(scores))
+        scores = df[["Math", "Science", "English"]].to_numpy()
 
-    # Graph
-    plt.bar(df["Name"], df["Score"])
-    plt.title("Student Performance")
-    plt.xlabel("Students")
-    plt.ylabel("Scores")
-    plt.show()
+        mean_scores = np.mean(scores, axis=0)
+
+        median_scores = np.median(scores, axis=0)
+
+        std_dev_scores = np.std(scores, axis=0)
+
+        print("\n--- NumPy Analysis ---")
+
+        print(f"Mean Scores (Math, Science, English): {mean_scores}")
+
+        print(f"Median Scores (Math, Science, English): {median_scores}")
+
+        print(f"Standard Deviation (Math, Science, English): {std_dev_scores}")
+
+        top_math = df.loc[df["Math"].idxmax(), "Name"]
+
+        top_science = df.loc[df["Science"].idxmax(), "Name"]
+
+        top_english = df.loc[df["English"].idxmax(), "Name"]
+
+        print("\n--- Top Performers ---")
+
+        print(f"Math: {top_math}")
+
+        print(f"Science: {top_science}")
+
+        print(f"English: {top_english}")
+
+        subjects = ["Math", "Science", "English"]
+
+        plt.bar(subjects, mean_scores,
+                color=["blue", "green", "orange"])
+
+        plt.title("Average Scores per Subject")
+
+        plt.xlabel("Subjects")
+
+        plt.ylabel("Average Score")
+
+        plt.show()
+
+        df.plot(
+            x="Name",
+            y=["Math", "Science", "English"],
+            kind="bar"
+        )
+
+        plt.title("Student Performance Comparison")
+
+        plt.ylabel("Scores")
+
+        plt.show()
+
+    except FileNotFoundError:
+
+        print("Error: The CSV file was not found. Please check the file path.")
+
+    except Exception as e:
+
+        print(f"Unexpected Error: {e}")
 
 
 # -------------------------------
